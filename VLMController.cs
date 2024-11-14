@@ -34,23 +34,23 @@ namespace VLM_Middleware.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult GetData([FromBody] QueryRequest request)
+        [HttpGet]
+        public IActionResult GetData([FromQuery] string query)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.Query))
+            if (string.IsNullOrWhiteSpace(query))
             {
                 return BadRequest("Query is required.");
             }
 
             try
             {
-                var dataTable = ExecuteQuery(request.Query);
+                var dataTable = ExecuteQuery(query);
                 var result = ConvertDataTableToJson(dataTable);
-                return Ok(result);
+                return Ok(result); // The result will be serialized to JSON
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "XXXXAn error occurred while executing the query.");
+                _logger.LogError(ex, "An error occurred while executing the query.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
             }
         }
@@ -63,7 +63,6 @@ namespace VLM_Middleware.Controllers
             {
                 var dataTable = new DataTable();
                 command.CommandTimeout = 300;
-
 
                 connection.Open();
                 adapter.Fill(dataTable);
@@ -85,10 +84,5 @@ namespace VLM_Middleware.Controllers
             }
             return rows;
         }
-    }
-
-    public class QueryRequest
-    {
-        public string Query { get; set; }
     }
 }
