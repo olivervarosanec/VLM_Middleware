@@ -57,25 +57,12 @@ curl -X GET "http://localhost:5000/VLM?query=SELECT%20*%20FROM%20TableName" -H "
 ```
 - Returns a JSON response with the data from the table.
 
-## 🛠️ Project Structure
-- `Controllers/VLMController.cs`: Contains the main API logic for executing SQL queries and returning JSON responses.
-- `Program.cs`: The entry point for configuring and starting the application.
-
 ## 🚨 Error Handling
 If an error occurs during execution, the API will return a 500 status code with an appropriate message. The logs provide more context for troubleshooting.
 
 ## 🔒 Security Considerations
 - Use a secure connection string to avoid exposing sensitive credentials.
 - Validate all user inputs to prevent SQL injection attacks.
-
-## 🤝 Contributing
-We welcome contributions! Feel free to submit issues or pull requests.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add your feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a pull request
 
 ---
 
