@@ -5,6 +5,7 @@ using System;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace VLM_Middleware.Controllers
 {
@@ -23,10 +24,6 @@ namespace VLM_Middleware.Controllers
             if (context != null && context.Request.Headers.ContainsKey("ConnectionString"))
             {
                 _connectionString = context.Request.Headers["ConnectionString"].ToString();
-            }
-            else if (true)
-            {
-                _connectionString = "Data Source=WIN-KHQFLH3GIF0;Initial Catalog=DMO_USCFPL;Integrated Security=True;TrustServerCertificate=True;";
             }
             else
             {
@@ -51,7 +48,7 @@ namespace VLM_Middleware.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while executing the query.");
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request. - " + ex.Message);
             }
         }
 
@@ -78,11 +75,26 @@ namespace VLM_Middleware.Controllers
                 var row = new Dictionary<string, object>();
                 foreach (DataColumn col in table.Columns)
                 {
-                    row[col.ColumnName] = dr[col];
+                    var columnValue = dr[col];
+                    if (col.ColumnName == "items" && columnValue is string jsonString && IsJson(jsonString))
+                    {
+                        // Parse the JSON string to an object
+                        row[col.ColumnName] = JsonSerializer.Deserialize<object>(jsonString);
+                    }
+                    else
+                    {
+                        row[col.ColumnName] = columnValue;
+                    }
                 }
                 rows.Add(row);
             }
             return rows;
+        }
+
+        private bool IsJson(string input)
+        {
+            input = input.Trim();
+            return (input.StartsWith("{") && input.EndsWith("}")) || (input.StartsWith("[") && input.EndsWith("]"));
         }
     }
 }
